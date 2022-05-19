@@ -1,0 +1,100 @@
+﻿@model IEnumerable<Crud_dapper.Models.EmployeeModel>
+
+@{
+    ViewBag.Title = "Index";
+    
+    @*List<SelectListItem> l1= new List<SelectListItem>
+            l1.Add(new SelectListItem { Text = "IT", Value = "IT" });
+        l1.Add(new SelectListItem { Text = "IT", Value = "IT" });
+        l1.Add(new SelectListItem { Text = "IT", Value = "IT" });*@
+
+}
+
+<h2>Employee List</h2>
+
+<p>
+    @Html.ActionLink("Deleted Employee", "DeletedEmployee") |
+    @Html.ActionLink("Create New", "AddOrEdit")</p>
+    <form asp-controller="Employee" asp-action="Index">
+        <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+        <input type="submit" value="Search" class="img-circle" /> |
+        @Html.ActionLink("Back to list", "Index")
+    </form>
+
+
+        @*Html.TextBox("search")
+        @Html.ActionLink("Search", "Index")
+        < input type = "submit"
+            name = "submit"
+            value = "Search" / >*@
+
+
+<table class="table">
+    <tr>
+        <th>
+            SR. NO.
+        </th>
+        @* <th>
+                @Html.DisplayNameFor(model => model.EmployeeID)
+            </th>*@
+    <th>
+       
+        @Html.ActionLink("Name","Index",new { sortOrder  = ViewBag.SortingName }) 
+    </th>
+    <th>
+        @Html.ActionLink("Department", "Index", new { sortOrder = ViewBag.SortingDepartment })
+
+
+       
+
+    </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Gender)
+        </th>
+        <th>
+            @Html.ActionLink("Email", "Index", new { sortOrder = ViewBag.SortingEmail })
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Skills)
+        </th>
+        
+        <th></th>
+    </tr>
+    @{ int i = 1; }
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @i
+            </td>
+            @{ i++; }
+            @*<td>
+                    @Html.DisplayFor(modelItem => item.EmployeeID)
+                </td>*@
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Department)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Gender)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Skills)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "AddOrEdit", new { id = item.EmployeeID }) |
+
+                @Html.ActionLink("Delete", "Delete", new { id = item.EmployeeID })
+
+                @*Html.ActionLink("Search", "Search", new { search = item.Search})*@
+
+            </td>
+        </tr>
+    }
+
+</table>
