@@ -8,7 +8,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
-
+using PagedList;
+using PagedList.Mvc;
 namespace Crud_dapper.Controllers
 {
     public class EmployeeController : Controller
@@ -17,7 +18,7 @@ namespace Crud_dapper.Controllers
         // string sort = "ASC";
 
         // GET: Employee
-        public ActionResult Index(string sortOrder, string searchString)
+        public ActionResult Index(string sortOrder, string searchString, int? page)
         {
             EmployeeModel emp = new EmployeeModel();
             if (searchString == null)
@@ -49,74 +50,31 @@ namespace Crud_dapper.Controllers
                         a = a.OrderBy(stu => stu.Name);
                         break;
                 }
-                return View(a.ToList());
+                return View(a.ToList().ToPagedList(page ?? 1,10));
             }
             else
             {
                 //EmployeeModel emp = new EmployeeModel();
                 //emp.Sort = sort;
-                emp.Sorted = true;
+                //emp.Sorted = true;
                 if (sortOrder == null)
                 {
                     ViewData["CurrentFilter"] = searchString;
                     if (searchString == null)
                     {
-                        return View(DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null));
+                        var xyz = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
+                        return View(xyz.ToPagedList(page ??1, 10));
                     }
                     else
                     {
                         DynamicParameters param1 = new DynamicParameters();
                         param1.Add("@Search", searchString);
-                        return View(DapperORM.ReturnList<EmployeeModel>("SearchItem", param1));
+                        var zyx = DapperORM.ReturnList<EmployeeModel>("SearchItem", param1);
+                        return View(zyx.ToPagedList(page ?? 1, 10));
                         //return RedirectToAction("Index");
                     }
                 }
                 return RedirectToAction("Index");
-                ////ViewData["NameSortParm"] = sortOrder;
-                ////ViewData["Department"] = sortOrder;
-                //else
-                //{
-                //else
-                //{
-
-                //DynamicParameters param = new DynamicParameters();
-                //param.Add("@Name", sortOrder);
-                //var a = DapperORM.ReturnList<EmployeeModel>("SortAsc", param);
-                //if (sortOrder == "Name")
-                //{
-                //    var b = a.OrderBy(x => x.Name);
-                //}
-                //else if ()
-                //{
-
-                //};
-                //{
-
-                //}
-
-                //if (emp.Sorted == true)
-                //{
-                //    emp.Sorted = false;
-                //    DynamicParameters param2 = new DynamicParameters();
-                //    param2.Add("@Name", sortOrder);
-                //    //var a = DapperORM.ReturnList<EmployeeModel>("SortAsc", param);
-                //    // var b = a.OrderBy(x => x.Name);
-
-                //    return View(DapperORM.ReturnList<EmployeeModel>("SortAsc", param2));
-                //}
-                //else if (emp.Sorted == false)
-                //{
-                //    emp.Sorted = true;
-                //    DynamicParameters param3 = new DynamicParameters();
-                //    param3.Add("@Name", sortOrder);
-                //    return View(DapperORM.ReturnList<EmployeeModel>("SortDesc", param3));
-                //}
-                //else
-                //{
-                //    return View(DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null));
-                //}
-
-                // }
             }
 
         }  
@@ -140,6 +98,7 @@ namespace Crud_dapper.Controllers
             {
                 DynamicParameters param = new DynamicParameters();
                 param.Add("@EmployeeID" , id);
+
                 return View(DapperORM.ReturnList<EmployeeModel>("EmployeeViewByID", param).FirstOrDefault<EmployeeModel>());
             }
 
@@ -168,7 +127,7 @@ namespace Crud_dapper.Controllers
                 }
                 else
                 {
-                    Skills = Skills + " ," + "VBA";
+                    Skills = Skills + ", " + "VBA";
                 }
                 
             }
@@ -180,7 +139,7 @@ namespace Crud_dapper.Controllers
                 }
                 else
                 {
-                    Skills = Skills + " ," + "Xamarin";
+                    Skills = Skills + ", " + "Xamarin";
                 }
             }
 

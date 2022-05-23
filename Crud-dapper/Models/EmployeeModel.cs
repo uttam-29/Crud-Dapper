@@ -46,6 +46,7 @@ namespace Crud_dapper.Models
 
         [Required]
         public int Status { get;  } 
+        public List<string> _Skills { get; set; }    
 
     }
 

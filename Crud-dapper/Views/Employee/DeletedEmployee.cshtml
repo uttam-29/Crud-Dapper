@@ -3,71 +3,84 @@
 @{
     ViewBag.Title = "DeletedEmployee";
 }
+
 <div>
    
 </div>
-<h2>Deleted  Employee</h2>
+<h2><em>Deleted  Employee</em></h2>
 
-<p>
-    @*Html.ActionLink("Create New", "AddOrEdit")*@  
+<p class="bg-warning">
+    @*Html.ActionLink("Create New", "AddOrEdit")*@
     @Html.ActionLink("Active Employee", "Index")
 </p>
-<table class="table">
-    <tr>
-        <th>
-            SR. NO.
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Department)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Gender)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Email)
-        </th>
-        @*
-        <th>
-            @Html.DisplayNameFor(model => model.Status)
-        </th>
-            *@
-       
-    </tr>
-    @{ int i = 1; }
+    <form asp-controller="Employee" asp-action="Index" >
+        <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+        <input type="submit" value="Search" class="btn-primary" /> |
+        @Html.ActionLink("Back to list", "Index")
+    </form>
 
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @i
-            </td>
-            @{ i++; }
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Department)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Gender)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            @*
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-           *@
-            <td>
-                @Html.ActionLink("Restore", "Restore", new { id = item.EmployeeID })
+    <div class="table-responsive custom-table-responsive">
+        <table class="table table-hover">
+            <tr class="bg-info text-primary text-center">
+                <th class="bg-info" scope="col">
+                    SR. NO.
+                </th>
+                <th class="bg-info" scope="col">
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th class="bg-info" scope="col">
+                    @Html.DisplayNameFor(model => model.Department)
+                </th>
+                <th class="bg-info" scope="col">
+                    @Html.DisplayNameFor(model => model.Gender)
+                </th>
+                <th class="bg-info" scope="col">
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th class="bg-info" scope="col">
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+             
+                <th class="bg-info" scope="col">
+                   
+                </th>
+              
 
-            </td>
-        </tr>
-    }
+            </tr>
+            @{ int i = 1; }
 
-</table>
+            @foreach (var item in Model)
+            {
+                
+                <tr class="bg-warning">
+                    <td>
+                        @i
+                    </td>
+                    @{ i++; }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Department)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Gender)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    
+                    <td>
+                        @Html.ActionLink("Restore", "Restore", new { id = item.EmployeeID }, new { @class = "btn btn-warning" })
 
+                    </td>
+                </tr>
+            }
+
+        </table>
+
+    </div>
