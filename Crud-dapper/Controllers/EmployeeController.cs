@@ -18,17 +18,51 @@ namespace Crud_dapper.Controllers
         // string sort = "ASC";
 
         // GET: Employee
-        public ActionResult Index(string sortOrder, string searchString, int? page)
+        public ActionResult Index(string sortOrder,string currentFilter, string searchString, int? page, int? pageSize)
         {
-            EmployeeModel emp = new EmployeeModel();
-            if (searchString == null)
+            if (searchString != null)
             {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            int defaSize = (pageSize ??10);
+
+            ViewBag.psize = defaSize;
+
+            //Dropdownlist code for PageSize selection  
+            //In View Attach this  
+            ViewBag.PageSize = new List<SelectListItem>()
+    {
+        new SelectListItem() { Value="5", Text= "5" },
+        new SelectListItem() { Value="10", Text= "10" },
+        new SelectListItem() { Value="15", Text= "15" },
+        new SelectListItem() { Value="25", Text= "25" },
+        new SelectListItem() { Value="50", Text= "50" },
+     };
+
+
+            ViewBag.CurrentFilter = searchString;
+            //var a;
+            EmployeeModel emp = new EmployeeModel();
+            var a = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                //ViewData["CurrentFilter"] = searchString;
+                DynamicParameters param1 = new DynamicParameters();
+                param1.Add("@Search", searchString);
+                a= a.Where(x=>x.Name.Contains(searchString));
+                //a = DapperORM.ReturnList<EmployeeModel>("SearchItem", param1);
+            }
+                ViewBag.CurrentSort = sortOrder;
                 ViewBag.SortingName = String.IsNullOrEmpty(sortOrder) ? "Name_Description" : "";
                 ViewBag.SortingDepartment = sortOrder == "dept_desc" ? "dept_asc" : "dept_desc";
                 ViewBag.SortingEmail = sortOrder == "email_desc" ? "email_asc" : "email_desc";
                 //DynamicParameters param = new DynamicParameters();
                 //param.Add("@Name", sortOrder);
-                var a = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
+               // var a = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
                 switch (sortOrder)
                 {
                     case "Name_Description":
@@ -50,34 +84,34 @@ namespace Crud_dapper.Controllers
                         a = a.OrderBy(stu => stu.Name);
                         break;
                 }
-                return View(a.ToList().ToPagedList(page ?? 1,10));
+                return View(a.ToList().ToPagedList(page ?? 1, defaSize));
             }
-            else
-            {
-                //EmployeeModel emp = new EmployeeModel();
-                //emp.Sort = sort;
-                //emp.Sorted = true;
-                if (sortOrder == null)
-                {
-                    ViewData["CurrentFilter"] = searchString;
-                    if (searchString == null)
-                    {
-                        var xyz = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
-                        return View(xyz.ToPagedList(page ??1, 10));
-                    }
-                    else
-                    {
-                        DynamicParameters param1 = new DynamicParameters();
-                        param1.Add("@Search", searchString);
-                        var zyx = DapperORM.ReturnList<EmployeeModel>("SearchItem", param1);
-                        return View(zyx.ToPagedList(page ?? 1, 10));
-                        //return RedirectToAction("Index");
-                    }
-                }
-                return RedirectToAction("Index");
-            }
-
-        }  
+            //else
+            //{
+            //    //EmployeeModel emp = new EmployeeModel();
+            //    //emp.Sort = sort;
+            //    //emp.Sorted = true;
+            //    if (sortOrder == null)
+            //    {
+            //        ViewData["CurrentFilter"] = searchString;
+            //        if (searchString == null)
+            //        {
+            //            var xyz = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
+            //            return View(xyz.ToPagedList(page ??1, 10));
+            //        }
+            //        else
+            //        {
+            //            DynamicParameters param1 = new DynamicParameters();
+            //            param1.Add("@Search", searchString);
+            //            var zyx = DapperORM.ReturnList<EmployeeModel>("SearchItem", param1);
+            //            return View(zyx.ToPagedList(page ?? 1, 10));
+            //            //return RedirectToAction("Index");
+            //        }
+            //    }
+            //    return RedirectToAction("Index");
+            //}
+            //return View(a.ToPagedList(page ?? 1, 10));
+          
 
         //  ..../Employee/AddOrEdit/id
 
@@ -88,7 +122,13 @@ namespace Crud_dapper.Controllers
 
 
         [HttpGet]
-        public ActionResult AddOrEdit(int id=0)
+        public ActionResult Add(int id=0)
+        {
+            return View();
+
+        }
+        [HttpGet]
+        public ActionResult Edit(int id = 0)
         {
             if (id == 0)
             {
@@ -96,17 +136,15 @@ namespace Crud_dapper.Controllers
             }
             else
             {
-                DynamicParameters param = new DynamicParameters();
-                param.Add("@EmployeeID" , id);
 
+                DynamicParameters param = new DynamicParameters();
+                param.Add("@EmployeeID", id);
                 return View(DapperORM.ReturnList<EmployeeModel>("EmployeeViewByID", param).FirstOrDefault<EmployeeModel>());
             }
-
-            
         }
 
         [HttpPost]
-        public ActionResult AddOrEdit(EmployeeModel emp)
+        public ActionResult Edit(EmployeeModel emp)
         {
             DynamicParameters pram = new DynamicParameters();
             pram.Add("@EmployeeID", emp.EmployeeID);
@@ -114,8 +152,8 @@ namespace Crud_dapper.Controllers
             pram.Add("@Department", emp.Department);
             pram.Add("@Gender", emp.Gender);
             pram.Add("@Email", emp.Email);
-            pram.Add("@Status",1);
-            if(emp.IsCSharp==true)
+            pram.Add("@Status", 1);
+            if (emp.IsCSharp == true)
             {
                 Skills = "C#";
             }
@@ -129,7 +167,7 @@ namespace Crud_dapper.Controllers
                 {
                     Skills = Skills + ", " + "VBA";
                 }
-                
+
             }
             if (emp.IsXamarin == true)
             {
@@ -142,20 +180,77 @@ namespace Crud_dapper.Controllers
                     Skills = Skills + ", " + "Xamarin";
                 }
             }
+            emp.Skills = Skills;
+            pram.Add("@Skills", emp.Skills);
+            DapperORM.Execute("EmployeeAddOrEdit", pram);
+            return RedirectToAction("Index");
+        }
 
 
+        [HttpPost]
+        public ActionResult Add(EmployeeModel emp)
+        {
+
+            DynamicParameters pram = new DynamicParameters();
+            pram.Add("@EmployeeID", emp.EmployeeID);
+            pram.Add("@Name", emp.Name);
+            pram.Add("@Department", emp.Department);
+            pram.Add("@Gender", emp.Gender);
+            pram.Add("@Email", emp.Email);
+            pram.Add("@Status", 1);
+            if (emp.IsCSharp == true)
+            {
+                Skills = "C#";
+            }
+            if (emp.IsVBA == true)
+            {
+                if (Skills == null)
+                {
+                    Skills = "VBA";
+                }
+                else
+                {
+                    Skills = Skills + ", " + "VBA";
+                }
+
+            }
+            if (emp.IsXamarin == true)
+            {
+                if (Skills == null)
+                {
+                    Skills = "Xamarin";
+                }
+                else
+                {
+                    Skills = Skills + ", " + "Xamarin";
+                }
+            }
             emp.Skills = Skills;
             pram.Add("@Skills", emp.Skills);
             DapperORM.Execute("EmployeeAddOrEdit", pram);
 
             return RedirectToAction("Index");
-        
         }
-        public ActionResult Delete(int id)
+        public ActionResult ConfirmDelete(int? id)
+        {
+            if (id == 0)
+            {
+                return View(DapperORM.ReturnList<EmployeeModel>("EmployeeViewById", null).FirstOrDefault<EmployeeModel>());
+
+            }
+            else
+            {
+                var a = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll",null);
+
+                return View(a.Where(x => x.EmployeeID == id).FirstOrDefault());
+            }
+        }
+        public ActionResult Delete(int? id)
         {
             DynamicParameters param = new DynamicParameters();
             param.Add("@EmployeeID", id);
             DapperORM.Execute("EmployeeDeleteByID",param);
+            //return View();
             return RedirectToAction("Index");
         }
 
@@ -167,16 +262,19 @@ namespace Crud_dapper.Controllers
             return RedirectToAction("Index");
         }
 
-        public ActionResult Search(string search= "Utt")
+        //public ActionResult Search(string search= "Utt")
+        //{
+        //    DynamicParameters param = new DynamicParameters();
+        //    param.Add("@Search", search);
+        //   // return View(DapperORM.ReturnList<EmployeeModel>("SearchItem",param));
+        //    return RedirectToAction("Index");
+
+        //}
+
+        public ActionResult ConfirmAdd()
         {
-            DynamicParameters param = new DynamicParameters();
-            param.Add("@Search", search);
-           // return View(DapperORM.ReturnList<EmployeeModel>("SearchItem",param));
-            return RedirectToAction("Index");
-
+            return View();
         }
-
-
 
     }
 }

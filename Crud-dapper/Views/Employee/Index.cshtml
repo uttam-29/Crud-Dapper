@@ -15,25 +15,22 @@
 }
 
 <h2><em>Employee List</em></h2>
+<div>
+
+    @Html.ActionLink("Deleted Employee", "DeletedEmployee", new { })|
 
 
-   
+    @Html.ActionLink("Create New", "Add")
+    @using (Html.BeginForm("Index", "Employee", FormMethod.Get))
+    {
+        <p>
+            Find by name: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+            <input type="submit" value="Search" />
+        </p>
+    }
+    @Html.ActionLink("Reset", "Index", new { }, new { @class = "btn btn-primary" })
 
-
-   
-            @Html.ActionLink("Deleted Employee", "DeletedEmployee", new { })|
-      
-
-            @Html.ActionLink("Create New", "AddOrEdit", new { })
-<form asp-controller="Employee" asp-action="Index">
-
-    <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
-
-    <input type="submit" value="Search" class="btn bg-primary" /> |
-
-    @Html.ActionLink("Back to list", "Index")
-</form> 
-
+</div>
 
 @*Html.TextBox("search")
     @Html.ActionLink("Search", "Index")
@@ -43,7 +40,7 @@
 
 <div class="table-responsive custom-table-responsive">
 
-    <table class="table table-hover">
+    <table class="table table-hover table-striped table-bordered">
         <tr class=" text-center text-primary bg-info">
             <th class="bg-info">
                 SR. NO.
@@ -69,16 +66,18 @@
                 @Html.DisplayNameFor(model => model.First().Skills)
             </th>
 
-            <th class="bg-info" scope="col"></th>
+            <th class="bg-info" scope="col">
+                Action
+            </th>
         </tr>
-        @{ int i = 1; }
+
         @foreach (var item in Model)
         {
-            <tr class="bg-warning">
+            <tr>
                 <td>
-                    @i
+                    @(Model.ToList().IndexOf(item) + 1)
                 </td>
-                @{ i++; }
+
                 @*<td>
                         @Html.DisplayFor(modelItem => item.EmployeeID)
                     </td>*@
@@ -98,9 +97,10 @@
                     @Html.DisplayFor(modelItem => item.Skills)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "AddOrEdit", new { id = item.EmployeeID }, new { @class = "btn btn-success" }) |
 
-                    @Html.ActionLink("Delete", "Delete", new { id = item.EmployeeID }, new { @class = "btn btn-danger" })
+                    @Html.ActionLink("Edit", "Edit", new { id = item.EmployeeID }, new { @class = "btn btn-success" }) |
+
+                    @Html.ActionLink("Delete", "ConfirmDelete", new { id = item.EmployeeID }, new { @class = "btn btn-danger" })
 
                     @*Html.ActionLink("Search", "Search", new { search = item.Search})*@
 
@@ -110,5 +110,30 @@
 
     </table>
 
-    @Html.PagedListPager(Model, page => Url.Action("Index", new {page }) )
+    @using (Html.BeginForm("Index", "Employee", FormMethod.Get))
+
+    {
+        <div id='Paging'>
+            Page @(Model.PageCount< Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+            @Html.PagedListPager(Model, page => Url.Action("Index",
+            new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter, pageSize = ViewBag.psize }))
+
+            Page Size: @Html.DropDownList("pageSize")
+            @*Html.PagedListPager(Model, page => Url.Action("Index", "Employee", new { page, searchString = Request.QueryString["search"] }))*@
+        </div>
+    }
+
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript"></script>
+<script>
+    $(document).ready(function () {
+         $("#pageSize").change(function () {
+                var url = "@Url.Action("Index", "Employee")?pageSize=" + this.value;
+                location.href = url
+            });
+     });
+
+
+</script>
