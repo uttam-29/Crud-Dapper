@@ -8,6 +8,13 @@ using System.Web;
 
 namespace Crud_dapper.Models
 {
+    public partial class Skills
+    {
+        public int ID { get; set; }
+        public string skill { get; set; }
+
+        public bool IsCheked { get; set; }
+    }
     public class EmployeeModel
     {
         [Required]
@@ -26,6 +33,8 @@ namespace Crud_dapper.Models
         
         //[Index(IsUnique = true)]
         [Display(Name = "Email")]
+        [EmailAddress]
+       // [CustomEmailVerification] //this is a custom function
         public string Email { get; set; }
 
         public bool IsCSharp { get; set; }

@@ -20,67 +20,68 @@
     </form>
 
     <div class="table-responsive custom-table-responsive">
-        <table class="table table-hover">
-            <tr class="bg-info text-primary text-center">
-                <th class="bg-info" scope="col">
-                    SR. NO.
-                </th>
-                <th class="bg-info" scope="col">
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th class="bg-info" scope="col">
-                    @Html.DisplayNameFor(model => model.Department)
-                </th>
-                <th class="bg-info" scope="col">
-                    @Html.DisplayNameFor(model => model.Gender)
-                </th>
-                <th class="bg-info" scope="col">
-                    @Html.DisplayNameFor(model => model.Email)
-                </th>
-                <th class="bg-info" scope="col">
-                    @Html.DisplayNameFor(model => model.Skills)
-                </th>
-             
-                <th class="bg-info" scope="col">
-                   Action
-                </th>
-              
-
-            </tr>
-            @{ int i = 1; }
-
-            @foreach (var item in Model)
-            {
+        <table class="table table-hover table-striped table-bordered">
+            <tr class=" text-center text-primary bg-info">
                 
-                <tr class="bg-warning">
-                    <td>
-                        @i
-                    </td>
-                    @{ i++; }
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Department)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Gender)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-                    
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Skills)
-                    </td>
-                    
-                    <td>
-                        @Html.ActionLink("Restore", "Restore", new { id = item.EmployeeID }, new { @class = "btn btn-warning" })
+                        <th class="bg-info" scope="col">
+                            SR. NO.
+                        </th>
+                        <th class="bg-info" scope="col">
+                            @Html.DisplayNameFor(model => model.Name)
+                        </th>
+                        <th class="bg-info" scope="col">
+                            @Html.DisplayNameFor(model => model.Department)
+                        </th>
+                        <th class="bg-info" scope="col">
+                            @Html.DisplayNameFor(model => model.Gender)
+                        </th>
+                        <th class="bg-info" scope="col">
+                            @Html.DisplayNameFor(model => model.Email)
+                        </th>
+                        <th class="bg-info" scope="col">
+                            @Html.DisplayNameFor(model => model.Skills)
+                        </th>
 
-                    </td>
-                </tr>
-            }
+                        <th class="bg-info" scope="col">
+                            Action
+                        </th>
 
-        </table>
+
+                    </tr>
+                    @{ int i = 1; }
+
+                    @foreach (var item in Model)
+                    {
+
+                        <tr>
+                            <td>
+                                @i
+                            </td>
+                            @{ i++; }
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Department)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Gender)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Email)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Skills)
+                            </td>
+
+                            <td>
+                                @Html.ActionLink("Restore", "Restore", new { id = item.EmployeeID }, new { @class = "btn btn-warning" })
+
+                            </td>
+                        </tr>
+                    }
+
+                </table>
 
     </div>

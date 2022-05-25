@@ -10,7 +10,10 @@ using System.Web.Mvc;
 using System.Web.UI.WebControls;
 using PagedList;
 using PagedList.Mvc;
+using System.ComponentModel.DataAnnotations;
+
 namespace Crud_dapper.Controllers
+
 {
     public class EmployeeController : Controller
     {
@@ -28,22 +31,24 @@ namespace Crud_dapper.Controllers
             {
                 searchString = currentFilter;
             }
-            int defaSize = (pageSize ??10);
+            int defaSize = (pageSize ??5);
 
             ViewBag.psize = defaSize;
 
             //Dropdownlist code for PageSize selection  
             //In View Attach this  
             ViewBag.PageSize = new List<SelectListItem>()
-    {
-        new SelectListItem() { Value="5", Text= "5" },
-        new SelectListItem() { Value="10", Text= "10" },
-        new SelectListItem() { Value="15", Text= "15" },
-        new SelectListItem() { Value="25", Text= "25" },
-        new SelectListItem() { Value="50", Text= "50" },
-     };
-
-
+            {
+                new SelectListItem() { Value="5", Text= "5" },
+                new SelectListItem() { Value="10", Text= "10" },
+                new SelectListItem() { Value="15", Text= "15" },
+                new SelectListItem() { Value="25", Text= "25" },
+                new SelectListItem() { Value="50", Text= "50" },
+                new SelectListItem() { Value="100", Text= "100" },
+            };
+            int pageNo = page ?? 1;
+            ViewBag.pageNo = pageNo;
+            ViewBag.SerialNumber = defaSize * (pageNo - 1);
             ViewBag.CurrentFilter = searchString;
             //var a;
             EmployeeModel emp = new EmployeeModel();
@@ -53,17 +58,18 @@ namespace Crud_dapper.Controllers
                 //ViewData["CurrentFilter"] = searchString;
                 DynamicParameters param1 = new DynamicParameters();
                 param1.Add("@Search", searchString);
-                a= a.Where(x=>x.Name.Contains(searchString));
-                //a = DapperORM.ReturnList<EmployeeModel>("SearchItem", param1);
+               // a= a.Where(x=>x.Name.Contains(searchString));
+                a = DapperORM.ReturnList<EmployeeModel>("SearchItem", param1);
             }
-                ViewBag.CurrentSort = sortOrder;
+               
                 ViewBag.SortingName = String.IsNullOrEmpty(sortOrder) ? "Name_Description" : "";
                 ViewBag.SortingDepartment = sortOrder == "dept_desc" ? "dept_asc" : "dept_desc";
                 ViewBag.SortingEmail = sortOrder == "email_desc" ? "email_asc" : "email_desc";
-                //DynamicParameters param = new DynamicParameters();
-                //param.Add("@Name", sortOrder);
-               // var a = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
-                switch (sortOrder)
+                ViewBag.CurrentSort = sortOrder;
+            //DynamicParameters param = new DynamicParameters();
+            //param.Add("@Name", sortOrder);
+            // var a = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
+            switch (sortOrder)
                 {
                     case "Name_Description":
                         a = a.OrderByDescending(stu => stu.Name);
@@ -85,36 +91,8 @@ namespace Crud_dapper.Controllers
                         break;
                 }
                 return View(a.ToList().ToPagedList(page ?? 1, defaSize));
-            }
-            //else
-            //{
-            //    //EmployeeModel emp = new EmployeeModel();
-            //    //emp.Sort = sort;
-            //    //emp.Sorted = true;
-            //    if (sortOrder == null)
-            //    {
-            //        ViewData["CurrentFilter"] = searchString;
-            //        if (searchString == null)
-            //        {
-            //            var xyz = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
-            //            return View(xyz.ToPagedList(page ??1, 10));
-            //        }
-            //        else
-            //        {
-            //            DynamicParameters param1 = new DynamicParameters();
-            //            param1.Add("@Search", searchString);
-            //            var zyx = DapperORM.ReturnList<EmployeeModel>("SearchItem", param1);
-            //            return View(zyx.ToPagedList(page ?? 1, 10));
-            //            //return RedirectToAction("Index");
-            //        }
-            //    }
-            //    return RedirectToAction("Index");
-            //}
-            //return View(a.ToPagedList(page ?? 1, 10));
-          
-
-        //  ..../Employee/AddOrEdit/id
-
+        }
+           
         public ActionResult DeletedEmployee()
         {
             return View(DapperORM.ReturnList<EmployeeModel>("DeletedEmployee", null) );
@@ -190,46 +168,58 @@ namespace Crud_dapper.Controllers
         [HttpPost]
         public ActionResult Add(EmployeeModel emp)
         {
+            var a = DapperORM.ReturnList<EmployeeModel>("EmployeeViewAll", null);
 
-            DynamicParameters pram = new DynamicParameters();
-            pram.Add("@EmployeeID", emp.EmployeeID);
-            pram.Add("@Name", emp.Name);
-            pram.Add("@Department", emp.Department);
-            pram.Add("@Gender", emp.Gender);
-            pram.Add("@Email", emp.Email);
-            pram.Add("@Status", 1);
-            if (emp.IsCSharp == true)
+            var isMailCheck = (from u in a
+                               where u.Email.ToLower() == emp.Email.ToLower()
+                               select new { }).FirstOrDefault();
+          if (isMailCheck != null)
             {
-                Skills = "C#";
+                TempData["Data"] = "Email Address already exist";
+                return View();
             }
-            if (emp.IsVBA == true)
+            else
             {
-                if (Skills == null)
+                DynamicParameters pram = new DynamicParameters();
+                pram.Add("@EmployeeID", emp.EmployeeID);
+                pram.Add("@Name", emp.Name);
+                pram.Add("@Department", emp.Department);
+                pram.Add("@Gender", emp.Gender);
+                pram.Add("@Email", emp.Email);
+                pram.Add("@Status", 1);
+                if (emp.IsCSharp == true)
                 {
-                    Skills = "VBA";
+                    Skills = "C#";
                 }
-                else
+                if (emp.IsVBA == true)
                 {
-                    Skills = Skills + ", " + "VBA";
-                }
+                    if (Skills == null)
+                    {
+                        Skills = "VBA";
+                    }
+                    else
+                    {
+                        Skills = Skills + ", " + "VBA";
+                    }
 
-            }
-            if (emp.IsXamarin == true)
-            {
-                if (Skills == null)
-                {
-                    Skills = "Xamarin";
                 }
-                else
+                if (emp.IsXamarin == true)
                 {
-                    Skills = Skills + ", " + "Xamarin";
+                    if (Skills == null)
+                    {
+                        Skills = "Xamarin";
+                    }
+                    else
+                    {
+                        Skills = Skills + ", " + "Xamarin";
+                    }
                 }
-            }
-            emp.Skills = Skills;
-            pram.Add("@Skills", emp.Skills);
-            DapperORM.Execute("EmployeeAddOrEdit", pram);
+                emp.Skills = Skills;
+                pram.Add("@Skills", emp.Skills);
+                DapperORM.Execute("EmployeeAddOrEdit", pram);
 
-            return RedirectToAction("Index");
+                return RedirectToAction("Index");
+            }
         }
         public ActionResult ConfirmDelete(int? id)
         {

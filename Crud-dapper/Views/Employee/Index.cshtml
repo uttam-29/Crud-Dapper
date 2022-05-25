@@ -15,20 +15,23 @@
 }
 
 <h2><em>Employee List</em></h2>
-<div>
-
-    @Html.ActionLink("Deleted Employee", "DeletedEmployee", new { })|
-
-
-    @Html.ActionLink("Create New", "Add")
-    @using (Html.BeginForm("Index", "Employee", FormMethod.Get))
-    {
+<div class="row">
+    <div class="col-xs-5 ">
+        @Html.ActionLink("Deleted Employee", "DeletedEmployee", new { }, new {@class= "btn btn-primary"})
+        @Html.ActionLink("Create New", "Add", new { }, new { @class = "btn btn-primary" })
+    </div>
+    <div class="col-xs-offset-8">
+        @using (Html.BeginForm("Index", "Employee", FormMethod.Get))
+        {
         <p>
-            Find by name: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
-            <input type="submit" value="Search" />
+            @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+            @*<input type="submit" value="Search" class=" btn btn-primary" />*@
+            @Html.ActionLink("Search", "Index", new { sortOrder = ViewBag.SortingName, currentFilter = ViewBag.CurrentFilter, page = ViewBag.pageNo, pageSize = ViewBag.psize }, new { @class = "btn btn-primary" })
+            @Html.ActionLink("Reset", "Index", new { }, new { @class = "btn btn-primary" })
         </p>
-    }
-    @Html.ActionLink("Reset", "Index", new { }, new { @class = "btn btn-primary" })
+
+        }
+    </div>
 
 </div>
 
@@ -50,17 +53,17 @@
                 </th>*@
             <th class="bg-info " scope="col">
 
-                @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.SortingName })
+                @Html.ActionLink("Name", "Index", new { sortOrder = ViewBag.SortingName, currentFilter = ViewBag.CurrentFilter, page = ViewBag.pageNo, pageSize = ViewBag.psize })
             </th>
             <th class="bg-info" scope="col">
-                @Html.ActionLink("Department", "Index", new { sortOrder = ViewBag.SortingDepartment })
+                @Html.ActionLink("Department", "Index", new { sortOrder = ViewBag.SortingDepartment, currentFilter = ViewBag.CurrentFilter, page = ViewBag.pageNo, pageSize = ViewBag.psize })
 
             </th>
             <th class="bg-info" scope="col">
                 @Html.DisplayNameFor(model => model.First().Gender)
             </th>
             <th class="bg-info " scope="col">
-                @Html.ActionLink("Email", "Index", new { sortOrder = ViewBag.SortingEmail })
+                @Html.ActionLink("Email", "Index", new { sortOrder = ViewBag.SortingEmail, currentFilter = ViewBag.CurrentFilter, page = ViewBag.pageNo, pageSize = ViewBag.psize })
             </th>
             <th class="bg-info" scope="col">
                 @Html.DisplayNameFor(model => model.First().Skills)
@@ -75,7 +78,8 @@
         {
             <tr>
                 <td>
-                    @(Model.ToList().IndexOf(item) + 1)
+                    
+                    @(Model.ToList().IndexOf(item) + 1+ @ViewBag.SerialNumber)
                 </td>
 
                 @*<td>
@@ -113,27 +117,32 @@
     @using (Html.BeginForm("Index", "Employee", FormMethod.Get))
 
     {
-        <div id='Paging'>
-            Page @(Model.PageCount< Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
-            @Html.PagedListPager(Model, page => Url.Action("Index",
-            new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter, pageSize = ViewBag.psize }))
+<div id='Paging'>
+    Page @(Model.PageCount< Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+    @Html.PagedListPager(Model, page => Url.Action("Index", "Employee",
+    new { sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter, page, pageSize = ViewBag.psize }))
+</div>
+<div>
+    @Html.PagedListPager(Model, pageSize => Url.Action("Index", "Employee",
+   new { sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter, page = ViewBag.pageNo, pageSize }))
 
-            Page Size: @Html.DropDownList("pageSize")
-            @*Html.PagedListPager(Model, page => Url.Action("Index", "Employee", new { page, searchString = Request.QueryString["search"] }))*@
-        </div>
+    Page Size: @Html.DropDownList("pageSize")
+    @*Html.PagedListPager(Model, page => Url.Action("Index", "Employee", new { page, searchString = Request.QueryString["search"] }))*@
+</div>
     }
 
 </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<script type="text/javascript"></script>
-<script>
-    $(document).ready(function () {
-         $("#pageSize").change(function () {
-                var url = "@Url.Action("Index", "Employee")?pageSize=" + this.value;
-                location.href = url
-            });
-     });
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript"></script>
+    <script>
+        $(document).ready(function () {
+             $("#pageSize").change(function () {
+                    var url = "@Url.Action("Index", "Employee")?pageSize=" + this.value;
+                    location.href = url
+                });
+         });
 
 
-</script>
+    </script>
